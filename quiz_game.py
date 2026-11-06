@@ -1,12 +1,13 @@
 """게임 전체를 관리하는 QuizGame 클래스"""
 
-import json  # [추가] JSON 파일 읽기/쓰기
-from pathlib import Path  # [추가] 파일 경로 다루기
+import json  # JSON 파일 읽기/쓰기
+import random  # [추가] 문제 순서 섞기 (보너스)
+from pathlib import Path  # 파일 경로 다루기
 
 from default_quizzes import get_default_quizzes
 from quiz import Quiz
 
-# [추가] 데이터 파일 위치: 프로젝트 폴더(이 파일과 같은 폴더)의 state.json
+# 데이터 파일 위치: 프로젝트 폴더(이 파일과 같은 폴더)의 state.json
 STATE_FILE = Path(__file__).parent / "state.json"
 
 
@@ -18,12 +19,12 @@ class QuizGame:
     def __init__(self):
         self.quizzes = []        # 퀴즈 목록 (Quiz 객체들)
         self.best_score = None   # 최고 점수 (기록이 없으면 None)
-        self.load_state()        # [추가] 시작할 때 파일에서 불러오기
+        self.load_state()        # 시작할 때 파일에서 불러오기
 
     # ---------- 파일 저장/불러오기 ----------
 
     def load_state(self):
-        """[추가] state.json에서 퀴즈와 최고 점수를 불러온다."""
+        """state.json에서 퀴즈와 최고 점수를 불러온다."""
         if not STATE_FILE.exists():
             print("📂 저장된 데이터가 없어 기본 퀴즈로 시작합니다.")
             self.quizzes = get_default_quizzes()
@@ -50,7 +51,7 @@ class QuizGame:
         print(f"📂 저장된 데이터를 불러왔습니다. (퀴즈 {len(quizzes)}개, 최고점수 {best_text})")
 
     def save_state(self):
-        """[추가] 퀴즈와 최고 점수를 state.json에 UTF-8로 저장한다."""
+        """퀴즈와 최고 점수를 state.json에 UTF-8로 저장한다."""
         data = {
             "quizzes": [quiz.to_dict() for quiz in self.quizzes],
             "best_score": self.best_score,
@@ -107,14 +108,18 @@ class QuizGame:
     # ---------- 게임 기능 ----------
 
     def play_quiz(self):
-        """퀴즈를 차례로 출제하고, 끝나면 최고 점수와 비교한다."""
+        """퀴즈를 무작위 순서로 출제하고, 끝나면 최고 점수와 비교한다."""
         if not self.quizzes:
             print("📭 등록된 퀴즈가 없습니다. 먼저 퀴즈를 추가해 주세요.")
             return
 
         print(f"\n📝 퀴즈를 시작합니다! (총 {len(self.quizzes)}문제)")
+        # [추가] 원본 순서는 그대로 두고, 복사본을 섞어서 출제한다. (보너스)
+        questions = self.quizzes[:]
+        random.shuffle(questions)
+
         correct = 0  # 맞힌 개수
-        for number, quiz in enumerate(self.quizzes, start=1):
+        for number, quiz in enumerate(questions, start=1):
             quiz.display(number)
             user_answer = self.get_number("정답 입력: ", 1, 4)
             if quiz.is_correct(user_answer):
@@ -138,7 +143,7 @@ class QuizGame:
             choices.append(self.get_text(f"선택지 {index}: "))
         answer = self.get_number("정답 번호 (1-4): ", 1, 4)
         self.quizzes.append(Quiz(question, choices, answer))
-        self.save_state()  # [추가] 추가한 퀴즈를 파일에 저장
+        self.save_state()  # 추가한 퀴즈를 파일에 저장
         print("\n✅ 퀴즈가 추가되었습니다!")
 
     def show_quiz_list(self):
@@ -157,7 +162,7 @@ class QuizGame:
         """이번 점수가 최고 점수보다 높으면 최고 점수를 바꾼다."""
         if self.best_score is None or score > self.best_score:
             self.best_score = score
-            self.save_state()  # [추가] 최고 점수를 파일에 저장
+            self.save_state()  # 최고 점수를 파일에 저장
             print("🎉 새로운 최고 점수입니다!")
         else:
             print(f"현재 최고 점수는 {self.best_score}점입니다.")
@@ -185,6 +190,6 @@ class QuizGame:
             elif choice == 4:
                 self.show_best_score()
             else:
-                self.save_state()  # [추가] 종료 전에 저장
+                self.save_state()  # 종료 전에 저장
                 print("👋 게임을 종료합니다. 안녕히 가세요!")
                 break
