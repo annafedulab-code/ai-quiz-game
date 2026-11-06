@@ -122,3 +122,5 @@ ai-quiz-game/
 - 사용한 Git 명령어: `init`, `add`, `commit`, `push`, `checkout`, `merge`
 
 ![브랜치 병합 그래프](docs/screenshots/git_graph_merge.png)
+
+- clone/pull 실습: 저장소를 ai-quiz-game-clone 폴더에 clone하여 이 줄을 추가하고 push한 뒤, 원래 작업 폴더에서 pull로 반영했습니다. (사용한 Git 명령어에 clone, pull 추가)
