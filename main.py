@@ -1,5 +1,7 @@
 """AI 활용 상식 퀴즈 게임 - 실행 파일"""
 
+from default_quizzes import get_default_quizzes  # [추가] 기본 퀴즈 가져오기
+
 MENU_COUNT = 5  # 메뉴 개수
 
 
@@ -35,13 +37,38 @@ def get_number(prompt, min_value, max_value):
         return number
 
 
+def play_quiz(quizzes):
+    """[추가] 퀴즈를 차례로 출제하고, 맞힌 개수를 돌려준다."""
+    if not quizzes:
+        print("📭 등록된 퀴즈가 없습니다. 먼저 퀴즈를 추가해 주세요.")
+        return 0
+
+    print(f"\n📝 퀴즈를 시작합니다! (총 {len(quizzes)}문제)")
+    correct = 0  # 맞힌 개수
+    for number, quiz in enumerate(quizzes, start=1):
+        quiz.display(number)
+        user_answer = get_number("정답 입력: ", 1, 4)
+        if quiz.is_correct(user_answer):
+            print("✅ 정답입니다!")
+            correct += 1
+        else:
+            print(f"❌ 오답입니다. 정답은 {quiz.answer}번입니다.")
+
+    score = round(correct / len(quizzes) * 100)
+    print("=" * 40)
+    print(f"🏆 결과: {len(quizzes)}문제 중 {correct}문제 정답! ({score}점)")
+    print("=" * 40)
+    return correct
+
+
 def main():
     """메뉴를 반복해서 보여 주고, 선택에 따라 동작한다."""
+    quizzes = get_default_quizzes()  # [추가] 퀴즈 목록 준비
     while True:
         show_menu()
         choice = get_number("선택: ", 1, MENU_COUNT)
         if choice == 1:
-            print("📝 퀴즈 풀기 기능은 준비 중입니다.")
+            play_quiz(quizzes)  # [변경] 실제 퀴즈 풀기
         elif choice == 2:
             print("📌 퀴즈 추가 기능은 준비 중입니다.")
         elif choice == 3:
@@ -58,4 +85,3 @@ if __name__ == "__main__":
         main()
     except (KeyboardInterrupt, EOFError):
         print("\n\n⚠️ 입력이 중단되어 프로그램을 안전하게 종료합니다.")
-
