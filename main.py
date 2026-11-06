@@ -49,10 +49,10 @@ def get_text(prompt):
 
 
 def play_quiz(quizzes):
-    """퀴즈를 차례로 출제하고, 맞힌 개수를 돌려준다."""
+    """퀴즈를 차례로 출제하고, 점수(0~100)를 돌려준다. 퀴즈가 없으면 None."""
     if not quizzes:
         print("📭 등록된 퀴즈가 없습니다. 먼저 퀴즈를 추가해 주세요.")
-        return 0
+        return None  # [변경] 풀지 않았다는 표시
 
     print(f"\n📝 퀴즈를 시작합니다! (총 {len(quizzes)}문제)")
     correct = 0  # 맞힌 개수
@@ -69,7 +69,7 @@ def play_quiz(quizzes):
     print("=" * 40)
     print(f"🏆 결과: {len(quizzes)}문제 중 {correct}문제 정답! ({score}점)")
     print("=" * 40)
-    return correct
+    return score  # [변경] 점수를 돌려준다
 
 
 def add_quiz(quizzes):
@@ -85,7 +85,7 @@ def add_quiz(quizzes):
 
 
 def show_quiz_list(quizzes):
-    """[추가] 등록된 퀴즈의 문제 목록을 보여 준다."""
+    """등록된 퀴즈의 문제 목록을 보여 준다."""
     if not quizzes:
         print("📭 등록된 퀴즈가 없습니다. 먼저 퀴즈를 추가해 주세요.")
         return
@@ -97,20 +97,40 @@ def show_quiz_list(quizzes):
     print("-" * 40)
 
 
+def update_best_score(score, best_score):
+    """[추가] 이번 점수와 최고 점수를 비교해, 더 높은 점수를 돌려준다."""
+    if best_score is None or score > best_score:
+        print("🎉 새로운 최고 점수입니다!")
+        return score
+    print(f"현재 최고 점수는 {best_score}점입니다.")
+    return best_score
+
+
+def show_best_score(best_score):
+    """[추가] 최고 점수를 보여 준다. 아직 기록이 없으면 안내한다."""
+    if best_score is None:
+        print("📭 아직 퀴즈를 푼 기록이 없습니다. 먼저 퀴즈를 풀어 보세요.")
+    else:
+        print(f"\n🏆 최고 점수: {best_score}점")
+
+
 def main():
     """메뉴를 반복해서 보여 주고, 선택에 따라 동작한다."""
     quizzes = get_default_quizzes()  # 퀴즈 목록 준비
+    best_score = None  # [추가] 최고 점수 (아직 기록 없음)
     while True:
         show_menu()
         choice = get_number("선택: ", 1, MENU_COUNT)
         if choice == 1:
-            play_quiz(quizzes)
+            score = play_quiz(quizzes)  # [변경] 점수 받기
+            if score is not None:
+                best_score = update_best_score(score, best_score)
         elif choice == 2:
             add_quiz(quizzes)
         elif choice == 3:
-            show_quiz_list(quizzes)  # [변경] 퀴즈 목록
+            show_quiz_list(quizzes)
         elif choice == 4:
-            print("🏆 점수 확인 기능은 준비 중입니다.")
+            show_best_score(best_score)  # [변경] 점수 확인
         else:
             print("👋 게임을 종료합니다. 안녕히 가세요!")
             break
