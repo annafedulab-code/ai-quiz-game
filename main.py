@@ -1,7 +1,7 @@
 """AI 활용 상식 퀴즈 게임 - 실행 파일"""
 
 from default_quizzes import get_default_quizzes  # 기본 퀴즈 가져오기
-from quiz import Quiz  # [추가] 새 퀴즈를 만들 때 사용
+from quiz import Quiz  # 새 퀴즈를 만들 때 사용
 
 MENU_COUNT = 5  # 메뉴 개수
 
@@ -39,7 +39,7 @@ def get_number(prompt, min_value, max_value):
 
 
 def get_text(prompt):
-    """[추가] 빈 칸이 아닌 글자를 입력받아 돌려준다."""
+    """빈 칸이 아닌 글자를 입력받아 돌려준다."""
     while True:
         text = input(prompt).strip()
         if text == "":
@@ -73,7 +73,7 @@ def play_quiz(quizzes):
 
 
 def add_quiz(quizzes):
-    """[추가] 문제, 선택지 4개, 정답 번호를 입력받아 새 퀴즈를 등록한다."""
+    """문제, 선택지 4개, 정답 번호를 입력받아 새 퀴즈를 등록한다."""
     print("\n📌 새로운 퀴즈를 추가합니다.\n")
     question = get_text("문제를 입력하세요: ")
     choices = []
@@ -82,6 +82,19 @@ def add_quiz(quizzes):
     answer = get_number("정답 번호 (1-4): ", 1, 4)
     quizzes.append(Quiz(question, choices, answer))
     print("\n✅ 퀴즈가 추가되었습니다!")
+
+
+def show_quiz_list(quizzes):
+    """[추가] 등록된 퀴즈의 문제 목록을 보여 준다."""
+    if not quizzes:
+        print("📭 등록된 퀴즈가 없습니다. 먼저 퀴즈를 추가해 주세요.")
+        return
+
+    print(f"\n📋 등록된 퀴즈 목록 (총 {len(quizzes)}개)\n")
+    print("-" * 40)
+    for number, quiz in enumerate(quizzes, start=1):
+        print(f"[{number}] {quiz.question}")
+    print("-" * 40)
 
 
 def main():
@@ -93,9 +106,9 @@ def main():
         if choice == 1:
             play_quiz(quizzes)
         elif choice == 2:
-            add_quiz(quizzes)  # [변경] 퀴즈 추가
+            add_quiz(quizzes)
         elif choice == 3:
-            print("📋 퀴즈 목록 기능은 준비 중입니다.")
+            show_quiz_list(quizzes)  # [변경] 퀴즈 목록
         elif choice == 4:
             print("🏆 점수 확인 기능은 준비 중입니다.")
         else:
